@@ -1,20 +1,21 @@
 #define SOIL_SENSOR_POWER_PIN 13
 #define WATER_PUMP_POWER_PIN 4
 #define SOIL_SENSOR_PIN A1
-#define WATERING_TIME_MS 7000
+#define WATERING_TIME_MS 5000
 #define SOIL_MOISTURE_THRESHOLD 300
 
 const unsigned long SECOND = 1000;
 const unsigned long HOUR = SECOND * 60 * 60;
 const unsigned long DELAY_MS = HOUR * 6;  // 6 hours in MS
+const unsigned long WATERING_COOLDOWN_MS = HOUR * 24;  // water a maximum of 1 time per day
 int soilMoisture = 0;
 
 // read soil moisture level from sensor and return result
 int getSoilMoisture() {
   digitalWrite(SOIL_SENSOR_POWER_PIN, HIGH);
-  delay(200);
+  delay(250);
   int result = analogRead(SOIL_SENSOR_PIN);
-  delay(200);
+  delay(250);
   digitalWrite(SOIL_SENSOR_POWER_PIN, LOW);
   return result;
 }
@@ -56,6 +57,7 @@ void loop() {
   if (soilMoisture < SOIL_MOISTURE_THRESHOLD) {
     digitalWrite(LED_BUILTIN, HIGH);
     pumpWater(WATERING_TIME_MS);
+    delay(WATERING_COOLDOWN_MS);
     digitalWrite(LED_BUILTIN, LOW);
   }
   delay(DELAY_MS);
